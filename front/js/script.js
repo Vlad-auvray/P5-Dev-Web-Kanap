@@ -27,8 +27,8 @@ function getArticles() {
 
             const itemLien = document.createElement("a");
             sectionProduits.appendChild(itemLien);
-            itemLien.href = 'product.html?id=${resultatAPI[article]._id}'
-            
+            itemLien.href = 'product.html?id=${resultatAPI[articles]._id}'
+
             const itemElement = document.createElement ("article")
             itemLien.appendChild(itemElement)
 
