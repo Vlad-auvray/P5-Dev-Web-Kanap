@@ -7,9 +7,9 @@ function main () {
 //Récupérer les articles depuis l'API
 
 function getArticles() {
-    fetch("http://localhost:3000/api/products")
-    .then(function (res) {
-        return res.json();
+    fetch("http://localhost:3000/api/products/")
+    .then(function (response) {
+        return response.json();
     })
 
 
@@ -17,10 +17,42 @@ function getArticles() {
     .then(function (resultatAPI) {
         const articles = resultatAPI;
         console.log(articles);
-        for (let article in articles) {
-            let productCard = document.createElement("div");
-            document.querySelector(".products").appendChild(productCard);
-            productCard.classList.add("product");
+    // On créer la boucle pour générer les fiches produits
+        for (let i = 0; i < articles.length; i++) {
+
+            // Récupération de l'élément du DOM
+            const sectionProduits = document.querySelector(".items")
+            
+            // Création des balises dédiées (l'ancre et l'article).
+
+            const itemLien = document.createElement("a");
+            sectionProduits.appendChild(itemLien);
+            itemLien.href = 'products.html?id=${resultatAPI[article]._id}'
+           
+            const itemElement = document.createElement ("article")
+            itemLien.appendChild(itemElement)
+
+            
+            // Création de l'élément
+            const imageElement = document.createElement("img");
+            // Aller chercher l'indice [i] pour ajouter l'image
+            imageElement.src = articles[i].imageUrl;
+            //Rattacher l'image
+            itemElement.appendChild(imageElement);
+
+            //Répétition pour le reste des éléments
+            const nomElement = document.createElement("h3");
+            nomElement.classList.add("productName");
+            nomElement.innerText = articles[i].name;
+            itemElement.appendChild(nomElement);
+
+            const descriptionElement = document.createElement("p");
+            descriptionElement.classList.add("productDescription")
+            descriptionElement.innerText = articles[i].description ?? "(Pas de description)";
+            itemElement.appendChild(descriptionElement);
+
         }
     }) 
+
+   
 }
