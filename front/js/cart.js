@@ -1,5 +1,5 @@
 const cart = document.querySelector("#cart");
-const copyOfLS = JSON.parse(localStorage.getItem("products"));
+const copyOfLS = JSON.parse(localStorage.getItem("product"));
 
 main();
 
@@ -10,14 +10,15 @@ function main() {
   }
 
   function displayCart() {
-    const cartCard = document.querySelector("#cart__items");
+    let cartCard = document.querySelector("#cart__items");
 
     // Si le tableau copié du localStorage contient au moins un objet, on affiche le panier
 
-    if(localStorage.getItem("products")){
+    if(localStorage.getItem("product")){
         cartCard.style.display = "flex";
         cartCard.style.flexDirection = "column"; 
         cartCard.style.justfyContent = "space-around";
+        
     }
   }
 
@@ -26,6 +27,7 @@ for (let i = 0 ; i < copyOfLS.length ; i++) {
 
     const productInCart = document.createElement("article");
     productInCart.classList.add("cart__item");
+    
 
     const productImage = document.createElement("img");
     productImage.classList.add("cart__item__img");
@@ -58,11 +60,11 @@ for (let i = 0 ; i < copyOfLS.length ; i++) {
     
      const productQuantity = document.createElement("div");
     productContent.appendChild(productQuantity);
-    productQuantity.classList.add("ccart__item__content__settings", "cart__item__content__settings__quantity");
+    productQuantity.classList.add("cart__item__content__settings", "cart__item__content__settings__quantity");
     productQuantity.innerHTML = copyOfLS[i].quantity;
 
    const productRemove = document.createElement("div");
-    productRemove.classList.add("art__item__content__settings__delete");
+    productRemove.classList.add("cart__item__content__settings__delete");
     productContent.appendChild(productRemove);
 
     const productRemoveAction = document.createElement("p");
@@ -71,6 +73,6 @@ for (let i = 0 ; i < copyOfLS.length ; i++) {
     productRemove.appendChild(productRemoveAction); 
 
 productRemoveAction.addEventListener("click", function()
-{sessionStorage.removeItem()}) ;
+{sessionStorage.removeItem(copyOfLS[i])}) ;
 
 }
