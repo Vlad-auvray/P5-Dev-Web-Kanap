@@ -76,3 +76,7 @@ productRemoveAction.addEventListener("click", function()
 {sessionStorage.removeItem(copyOfLS[i])}) ;
 
 }
+
+// function countTotalInCart() {
+    let arrayOfPrice = [];
+    let totalPrice = document.querySelector(totalPrice); 
