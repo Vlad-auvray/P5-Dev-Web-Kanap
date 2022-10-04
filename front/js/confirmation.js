@@ -1,18 +1,20 @@
 main();
 
 function main() {
-  displayOrderId();
-}
 
-function displayOrderId() {
-  
-  const orderId = document.querySelector("#orderId");
-  
-  
-  orderId.innerText = localStorage.getItem("orderId");
+  const orderIdSelector = document.querySelector("#orderId");
 
-  // On vide le localStorage pour recommencer plus tard le processus d'achat
-  localStorage.clear(); 
+  let params = (new URL(document.location)).searchParams;
+
+  let orderId = params.get("orderId");
+
+  if (orderId === undefined || orderId === "") {
+    orderIdSelector.innerHTML = "Message d'erreur";
+    alert("Message d'erreur");
+  } else {
+    orderIdSelector.innerHTML = orderId;
+  }
+
 }
 
 //IMPORTANT !! le LS avec orderId sera issu du cart.js, lors de la requête achat
