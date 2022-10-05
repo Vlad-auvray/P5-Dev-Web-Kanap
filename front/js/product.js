@@ -38,7 +38,7 @@ function getArticles() {
       productCardDescription.innerText = article.description;
 
       //Formater et exprimer le prix en €
-      article.price = article.price / 100;
+      article.price = article.price ;
       productCardPrice.innerText = new Intl.NumberFormat("fr-FR", {
         // style: "currency",
         //currency: "EUR",

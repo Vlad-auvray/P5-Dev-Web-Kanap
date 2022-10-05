@@ -1,97 +1,88 @@
-//const cart = document.querySelector("#cart");
+// pour différancier la page confirmation et panier
+const page = document.location.href;
 
 
-main();
+if (page.match("cart")) {
+  fetch("http://localhost:3000/api/products")
+  .then(function (response) {
+    return response.json();
+  })
+    .then((response) => {
+        console.log(response);
+        // appel de la fonction displayCart
+        displayCart(response);
+    })
+    .catch((err) => {
+        document.querySelector("#cartAndFormContainer").innerHTML = "<h1>erreur 404</h1>";
+        console.log("erreur 404, sur ressource api: " + err);
+    });
+  } else {
+    console.log("sur page confirmation");
+  
+}
 
-function main() {
-    displayCart();
-   // countTotalInCart();
-    // checkFormAndPostRequest();
+  // Conditions d'affichage du panier
+  // Récupération du LS
+// Si le panier contien un élément (différent de 0), alors on peut créer une corresspondance clef/valeur
+
+  function displayCart(index) {
+
+  let panier = JSON.parse(localStorage.getItem("cart"));
+
+  if(panier.length == null) {
+  for (let article of panier){
+    console.log(article);
+    console.log(panier);
+    for( let g = 0, h = index.length; g < h; g++) {
+      if (article._id === index[g]._id){
+        panier.name = index[g].name;
+        panier.price = index[g].price;
+        panier.image = index[g].imageUrl;
+        panier.description = index[g].description;
+        panier.altTxt = index[g].altTxt;
+      }
+    } 
   }
+display(panier);
 
-  function displayCart() {
-
-    let copyOfLS = JSON.parse(localStorage.getItem("cart"));
-    let cartCard = document.querySelector("#cart__items");
-
-    // Si le tableau copié du localStorage contient au moins un objet, on affiche le panier
-
-    if(copyOfLS!== null){
-        cartCard.style.display = "flex";
-        cartCard.style.flexDirection = "column"; 
-        cartCard.style.justfyContent = "space-around";
-        
-    }
-  }
-
- // Pour chaque objet dans le tableau copié du lS, on crée les divs qui vont contenir les données du tableau
-for (let i = 0 ; i < copyOfLS.length ; i++) {
-
-    if (productAdded._id === copyOfLS[i]._id) {
-        productAdded.name = copyOfLS[i].name
-    }
-
-
-
-
-
-
-
-
-
- //   let productInCart = document.createElement("article");
-  //  productInCart.classList.add("cart__item");
-  //  productInCart.
+} else{
+  document.querySelector("#totalQuantity").innerHTML = "0";
+    document.querySelector("#totalPrice").innerHTML = "0";
+    document.querySelector("h1").innerHTML =
+      "Vous n'avez pas d'article dans votre panier";
+}
+ // reste à l'écoute grâce aux fonctions suivantes pour modifier l'affichage
+// modifQuantité();
+ //suppression();
+}
+  
+// Afficher le panier
+function display(indexed) {
+let cartZone = document.querySelector("#cart__items");
+cartZone.innerHTML += indexed.map((panier)=>
+`<article class="cart__item" data-id="${panier._id}" data-couleur="${panier.couleur}" data-quantité="${panier.quantité}" data-prix="${panier.prix}"> 
+<div class="cart__item__img">
+  <img src="${panier.image}" alt="${panier.alt}">
+</div>
+<div class="cart__item__content">
+  <div class="cart__item__content__titlePrice">
+    <h2>${panier.name}</h2>
+    <span>couleur : ${panier.couleur}</span>
+    <p data-prix="${panier.prix}">${panier.prix} €</p>
+  </div>
+  <div class="cart__item__content__settings">
+    <div class="cart__item__content__settings__quantity">
+      <p>Qté : </p>
+      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${panier.quantité}">
+    </div>
+    <div class="cart__item__content__settings__delete">
+      <p class="deleteItem" data-id="${panier._id}" data-couleur="${panier.couleur}">Supprimer</p>
+    </div>
+  </div>
+</div>
+</article>`
+).join("");
+totalProduit();
+}
     
-
- //   let productImage = document.createElement("img");
-  //  productImage.classList.add("cart__item__img");
-  //  productImage.src = copyOfLS[i].imageUrl;
-  //  productInCart.appendChild(productImage);
-
-  //  let productContent = document.createElement("div");
-  //  productContent.classList.add("cart__item__content");
-   // productInCart.appendChild(productContent);
-
-  //  let productDescription = document.createElement("div");
-  //  productDescription.classList.add("cart__item__content__description");
- //   productContent.appendChild(productDescription);
-    
-   // let productName = document.createElement("h2");
-  //  productName.innerText = copyOfLS[i].name;
-  //  productDescription.appendChild(productName);
-
-  //  let productColor = document.createElement("p");
-  //  productColor.innerText = copyOfLS[i].colors;
-  //  productDescription.appendChild(productColor);
-
-  //  let productPrice = document.createElement("p");
-  //  productContent.appendChild(productPrice);
-   //     productPrice.innerHTML = new Intl.NumberFormat("fr-FR", {
-  //          style : "currency",
-  //          currency: "EUR",
- //       }).format(copyOfLS.price * copyOfLS[i].quantity);
-        
-    
- //    let productQuantity = document.createElement("div");
- //   productContent.appendChild(productQuantity);
- //   productQuantity.classList.add("cart__item__content__settings", "cart__item__content__settings__quantity");
-  //  productQuantity.innerHTML = copyOfLS[i].quantity;
-
- //  let productRemove = document.createElement("div");
-  //  productRemove.classList.add("cart__item__content__settings__delete");
-  //  productContent.appendChild(productRemove);
-//
-  //  let productRemoveAction = document.createElement("p");
-  //  productRemoveAction.classList.add("deleteItem");
-  //  productRemoveAction.innerText = "Supprimer";
-  //  productRemove.appendChild(productRemoveAction); 
-
-//productRemoveAction.addEventListener("click", function()
-//{sessionStorage.removeItem(copyOfLS[i])}) ;
-
-//}
-
-// function countTotalInCart() {
-   // let arrayOfPrice = [];
-  //  let totalPrice = document.querySelector("#totalPrice"); 
+  
