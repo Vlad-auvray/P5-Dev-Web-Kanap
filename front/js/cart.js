@@ -33,6 +33,7 @@ if (page.match("cart")) {
   for (let article of panier){
     console.log(article);
     console.log(panier);
+    // création du dadaset qui nous permettra ensuite d'afficher le panier
     for( let g = 0, h = index.length; g < h; g++) {
       if (article._id === index[g]._id){
         article.name = index[g].name;
@@ -84,15 +85,20 @@ cartZone.innerHTML += indexed.map((article)=>
 ).join("");
 totalProduit();
 }
-    
+  
+// Définition de la fonction de modification de quantité d'article dans le panier
+
 function modifQuantité() {
   const cart = document.querySelectorAll(".cart__item");
  
+  // On capte un éventuel clic sur le bouton 
   cart.forEach((cart) => {
     cart.addEventListener("change", (eq) => {
 
+      // Vérification de la valeur concernée
       let panier = JSON.parse(localStorage.getItem("cart"));
-    
+  
+      //on crée la boucle qui va modifier la valeur quantity
       for (article of panier)
         if (
           article._id === cart.dataset.id &&
@@ -100,37 +106,37 @@ function modifQuantité() {
         ) {
           article.quantity = eq.target.value;
           localStorage.cart = JSON.stringify(panier);
-         
+     // mise à jour du dataset     
           cart.dataset.quantity = eq.target.value;
-  
+  // puis actualisation de la fonction totalProduit
           totalProduit();
         }
     });
   });
 }
 
-// suppr
+// ajout de la fonction de suppression
 
 function suppression() {
   const cartDelete = document.querySelectorAll(".cart__item .deleteItem");
 
   cartDelete.forEach((cartDelete) => {
-
+ // On capte un éventuel clic sur le bouton 
     cartDelete.addEventListener("click", () => {
-      
+ // Appel du LS    
       let panier = JSON.parse(localStorage.getItem("cart"));
-      for (let d = 0, c = panier.kength; d < c; d++)
+      for (let d = 0, c = panier.length; d < c; d++)
       if (
         panier[d]._id === cartDelete.dataset.id &&
         panier[d].coulor === cartDelete.dataset.color
       ) {
-  
+  // déclaration de la variable
         const num = [d]; 
-  
+  // création du panier actualisé ...
         let newCart = JSON.parse(localStorage.getItem("cart"));
-  
+  //... qui enlève 1 item de sa version précédente
         newCart.splice(num, 1);
-  
+  // affichage du nouveau panier : s'il n'y a rien alors panier vide, sinon on affiche le nouveau panier et on recharge
         if (newCart && newCartlength == 0) {
   
           document.querySelector("#totalQuantity").innerHTML = "0";
@@ -149,6 +155,7 @@ function suppression() {
 });
 }
 
+
 function totalProduit () {
 
   let totalArticle = 0; 
@@ -156,14 +163,15 @@ function totalProduit () {
   let totalPrice = 0; 
 
   const cart = document.querySelectorAll(".cart__item");
-
+// pour tous les éléments du panier
   cart.forEach((cart) => {
+    // on liste les quantité des articles du dataset
     totalArticle += JSON.parse(cart.dataset.quantity); 
-
+// on calcul le prix sur la base du dataset
     totalPrice += cart.dataset.quantity * cart.dataset.price; 
 
   });
-
+// définition de l'endroit où le tout s'affichera
   document.getElementById("totalQuantity").textContent = totalArticle; 
 
   document.getElementById("totalPrice").textContent = totalPrice;
