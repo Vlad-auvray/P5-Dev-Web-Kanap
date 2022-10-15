@@ -50,6 +50,7 @@ function displayCart(products) {
   // reste à l'écoute grâce aux fonctions suivantes pour modifier l'affichage
   modifQuantité();
   suppression();
+  
 }
 
 // Afficher le panier
@@ -78,6 +79,7 @@ function display(product) {
         </div>
     </article>`;
   //totalProduit();
+ 
 }
 
 // Définition de la fonction de modification de quantité d'article dans le panier
@@ -97,12 +99,13 @@ function modifQuantité(product) {
     
     
       let panier = JSON.parse(localStorage.getItem("cart"));
-     for(let i = 0; i < panier; i++) {
-      if(panier[i].id == product.id && panier[i].color == product.color) {
-        panier[i].qunatity = parseInt(itemQuantitySelector.value);
-          localStorage.cart = JSON.stringify(panier);
+     for(let product of panier) {
+       for (let i = 0; i < panier.length ; i++){
+        if(panier[i].id == product.id && panier[i].color == product.color) {
+           panier[i].quantity = parseInt(itemQuantitySelector.value);
+             localStorage.cart = JSON.stringify(panier);
           return location.reload();
-     
+      }
      }}
     
 
@@ -149,9 +152,10 @@ function suppression() {
          for (let i = 0; i < panier.length ; i++) {
        if (panier[i].id == article.id  && panier[i].color == article.color){
         let newCart = JSON.parse(localStorage.getItem("cart"));
-        newCart.splice(article, 1)
+        newCart.splice(panier[i], 1)
           alert("Super le produit a été supprimé.");
           localStorage.cart = JSON.stringify(newCart);
+         // totalProduit();
           return location.reload();
       }}
     }
@@ -190,23 +194,111 @@ function suppression() {
 }
 
 
-function totalProduit() {
+//let totalArticle = [];
 
-  let totalArticle = 0;
+//let totalPrice = [];
 
-  let totalPrice = 0;
+//let quantityNumber = parseInt(panier[i].quantity);
+//let priceNumber = parseInt(panier[i].price * panier[i].quantity)
 
-  const cart = document.querySelectorAll(".cart__item");
-  // pour tous les éléments du panier
-  cart.forEach((cart) => {
-    // on liste les quantité des articles du dataset
-    totalArticle += JSON.parse(cart.dataset.quantity);
-    // on calcul le prix sur la base du dataset
-    totalPrice += cart.dataset.quantity * cart.dataset.price;
+//totalQuantity.push(quantityNumber);
+//totalPrice.push(priceNumber);
 
-  });
+//const reducer = (accumulator, currentValue) => accumulator + currentValue;
+//const totalQuantityResult = totalQuantity.reduce(reducer, 0);
+
+//const totalPriceyResult = totalPrice.reduce(reducer, 0);
+
+//function totalProduit() {
+
+ 
+
   // définition de l'endroit où le tout s'affichera
-  document.getElementById("totalQuantity").textContent = totalArticle;
+  //document.getElementById("totalQuantity").textContent += '$(totalQuantityResult)';
 
-  document.getElementById("totalPrice").textContent = totalPrice;
+  //document.getElementById("totalPrice").textContent += '$(totalPriceResult)';
+//}
+
+//totalProduit();
+
+
+// Formulaire et méthode POST /
+//
+
+//// REGEXs
+
+// création des variables :
+const prenom = document.getElementById("firstName");
+const nom = document.getElementById("lastName");
+const ville = document.getElementById("city");
+const adresse = document.getElementById("address");
+const mail = document.getElementById("email");
+
+// email
+const emailErrorMsg = document.getElementById("emailErrorMsg");
+function validateEmail(mail) {
+  const regexMail =
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (regexMail.test(mail) == false) {
+    return false;
+  } else {
+    emailErrorMsg.innerHTML = null;
+    return true;
+  }
+}
+// RegEx simple pour les noms
+
+const regexName = /^[a-z][a-z '-.,]{1,31}$|^$/i;
+
+// prénom
+const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+function validateFirstName(prenom) {
+  if (regexName.test(prenom) == false) {
+    return false;
+  } else {
+    firstNameErrorMsg.innerHTML = null;
+    return true;
+  }
+}
+
+// nom de famille
+const lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
+function validateLastName(nom) {
+  if (regexName.test(nom) == false) {
+    return false;
+  } else {
+    lastNameErrorMsg.innerHTML = null;
+    return true;
+  }
+}
+
+// ville
+const cityErrorMsg = document.getElementById("cityErrorMsg");
+function validateCity(ville) {
+  if (regexName.test(ville) == false) {
+    return false;
+  } else {
+    cityErrorMsg.innerHTML = null;
+    return true;
+  }
+}
+
+// Requête POST
+// Création du JSON du POST
+
+// fonction getForm() qui génère le"contact" du formulaire
+
+function makeJsonData() {
+  let contact = {
+    firstName: prenom.value,
+    lastName: nom.value,
+    address: adresse.value,
+    city: ville.value,
+    email: mail.value,
+  };
+  // puis intégrer le panier ... 
+
+
+
+
 }
