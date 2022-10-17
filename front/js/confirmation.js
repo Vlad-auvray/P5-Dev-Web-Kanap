@@ -17,4 +17,3 @@ function main() {
 
 }
 
-//IMPORTANT !! le LS avec orderId sera issu du cart.js, lors de la requête achat
