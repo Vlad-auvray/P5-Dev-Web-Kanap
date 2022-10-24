@@ -1,9 +1,15 @@
 // pour différancier la page confirmation et panier
 const page = document.location.href;
 
-let panier = JSON.parse(localStorage.getItem("cart"));
+// Création d'un fonction racourcie pour l'utilisation du localStorage
+let panier = getCartOnLocalStorage();
 
+//Création des expressions RegEx pour le formaulaire client
+let emailRegExp = new RegExp('^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$');
+let charRegExp = new RegExp("^[a-zA-Z ,.'-]+$");
+let addressRegExp = new RegExp("^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+");
 
+// Récupération de l'API
 if (page.match("cart")) {
   fetch("http://localhost:3000/api/products")
     .then(function (response) {
@@ -42,12 +48,12 @@ function displayCart(products) {
       }
     }
   } else {
-    
+// S'il n'y a pas de produits dans le localStorage alors on indique à l'utilisateur qu'il n'y a pas d'article dans le panier
     document.querySelector("h1").innerHTML = "Vous n'avez pas d'article dans votre panier";
     document.querySelector("#totalQuantity").innerHTML = "0";
     document.querySelector("#totalPrice").innerHTML = "0";
   }
-  // reste à l'écoute grâce aux fonctions suivantes pour modifier l'affichage
+  // reste à l'écoute grâce aux fonctions suivantes pour modifier l'affichage de la quantité totale et du priux total
   modifQuantité(products);
   suppression(products);
 
@@ -83,18 +89,19 @@ function display(product) {
 // Définition de la fonction de modification de quantité d'article dans le panier
 function modifQuantité(products) {
   const cart = document.querySelectorAll(".cart__item");
-  // On capte un éventuel clic sur le bouton 
+  // On capte un éventuel clic sur le bouton sur un produit spécifique, puis on remplace les informations du localStorage par les nouvelles données;
   cart.forEach((cart) => {
     const productId = cart.getAttribute('data-id');
     const productColor = cart.getAttribute('data-color');
     const itemQuantitySelector = cart.querySelector(".itemQuantity");
     itemQuantitySelector.addEventListener("change", (e) => {
       e.preventDefault();
-      let panier = JSON.parse(localStorage.getItem("cart"));
+      let panier = getCartOnLocalStorage();;
       for (let product of panier) {
         if (product.id == productId && product.color == productColor) {
           product.quantity = parseInt(itemQuantitySelector.value);
           localStorage.setItem("cart", JSON.stringify(panier));
+          //Mise à jour des totaux
           totalProduit(products);
           displayInfo();
         }
@@ -106,22 +113,25 @@ function modifQuantité(products) {
 // ajout de la fonction de suppression
 function suppression(products) {
   const cart = document.querySelectorAll(".cart__item");
-  // On capte un éventuel clic sur le bouton 
+  // On capte un éventuel clic sur le bouton Supprimer d'un produit du panier;  
   cart.forEach((article) => {
     const productId = article.getAttribute('data-id');
     const productColor = article.getAttribute('data-color');
     const deleteItemSelector = article.querySelector(".deleteItem");
     deleteItemSelector.addEventListener("click", (e) => {
-      let confirmDelete = confirm("Etes vous sur de vouloir supprimer ce produit du panier ?");
+      //On demande à l'utilisateur s'il est sûr de son choix
+      let confirmDelete = confirm("Etes vous sûr de vouloir supprimer ce produit du panier ?");
+      // Si l'utilisateur confirme son choix, on suprime le produit en question du localStorage
       if (confirmDelete) {
-        let panier = JSON.parse(localStorage.getItem("cart"));
+        let panier = getCartOnLocalStorage();;
         for (let i = 0; i < panier.length; i++) {
           if (panier[i].id == productId && panier[i].color == productColor) {
-            let newCart = JSON.parse(localStorage.getItem("cart"));
+            let newCart = getCartOnLocalStorage();;
             newCart.splice(i, 1);
             alert("Super le produit a été supprimé.");
             localStorage.setItem("cart", JSON.stringify(newCart));
             article.remove();
+             //Mise à jour des totaux
             totalProduit(products);
             displayInfo();
           }
@@ -131,36 +141,36 @@ function suppression(products) {
   });
 }
 
+// S'il n'y a pas de produit dans le localStorage, on informe l'utilisateur que le panier est vide
 function displayInfo() {
-  panier = JSON.parse(localStorage.getItem("cart"));
+  panier = getCartOnLocalStorage();;
   if (panier == 0 && panier.length == 0) {
     document.querySelector("h1").innerHTML = "Vous n'avez pas d'article dans votre panier";
   }
 }
 
-
+// Affichage des totaux "quantité" et "prix"
 function totalProduit(products) {
-  // définition de l'endroit où le tout s'affichera
-  // document.getElementById("totalPrice").textContent += '$(totalPriceResult)';
+ 
   const totalArticle = getTotalArticle();
   document.getElementById("totalQuantity").textContent = totalArticle;
 
   const totalPrice = getTotalPrice(products);
   document.getElementById("totalPrice").textContent = totalPrice;
 }
-
+// Création de la fonction de la quantité totale d'articles
 function getTotalArticle() {
   let totalArticle = 0;
-  panier = JSON.parse(localStorage.getItem("cart"));
+  panier = getCartOnLocalStorage();;
   for (let product of panier) {
     totalArticle = totalArticle + product.quantity;
   }
   return totalArticle;
 }
-
+// Création de la fonction de calcul du prix total
 function getTotalPrice(products) {
   let totalPrice = 0;
-  panier = JSON.parse(localStorage.getItem("cart"));
+  panier = getCartOnLocalStorage();;
   for (let product of panier) {
     for (let article of products) {
       if (product.id == article._id) {
@@ -175,152 +185,191 @@ function getTotalPrice(products) {
 // Formulaire et méthode POST /
 
 //// REGEXs
-
+//Création de la fonction de création de formulaire
 function getForm() {
-  
+
   let form = document.querySelector(".cart__order__form");
 
-  //Création des expressions 
-  let emailRegExp = new RegExp('^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$');
-  let charRegExp = new RegExp("^[a-zA-Z ,.'-]+$");
-  let addressRegExp = new RegExp("^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+");
-
   // Ecoute de la modification du prénom
-  form.firstName.addEventListener('change', function() {
-      validFirstName(this);
+  form.firstName.addEventListener('change', function () {
+    validFirstName(this);
   });
 
   // Ecoute de la modification du nom
-  form.lastName.addEventListener('change', function() {
-      validLastName(this);
+  form.lastName.addEventListener('change', function () {
+    validLastName(this);
   });
 
   // Ecoute de la modification de l'adresse
-  form.address.addEventListener('change', function() {
-      validAddress(this);
+  form.address.addEventListener('change', function () {
+    validAddress(this);
   });
 
   // Ecoute de la modification de la ville
-  form.city.addEventListener('change', function() {
-      validCity(this);
+  form.city.addEventListener('change', function () {
+    validCity(this);
   });
 
   // Ecoute de la modification du mail
-  form.email.addEventListener('change', function() {
-      validEmail(this);
+  form.email.addEventListener('change', function () {
+    validEmail(this);
   });
 
-  //validation du prénom
-  const validFirstName = function(inputFirstName) {
-      let firstNameErrorMsg = inputFirstName.nextElementSibling;
+}
 
-      if (charRegExp.test(inputFirstName.value)) {
-          firstNameErrorMsg.innerHTML = '';
-      } else {
-          firstNameErrorMsg.innerHTML = 'Veuillez renseigner ce champ.';
-      }
-  };
-
-  //validation du nom
-  const validLastName = function(inputLastName) {
-      let lastNameErrorMsg = inputLastName.nextElementSibling;
-
-      if (charRegExp.test(inputLastName.value)) {
-          lastNameErrorMsg.innerHTML = '';
-      } else {
-          lastNameErrorMsg.innerHTML = 'Veuillez renseigner ce champ.';
-      }
-  };
-
-  //validation de l'adresse
-  const validAddress = function(inputAddress) {
-      let addressErrorMsg = inputAddress.nextElementSibling;
-
-      if (addressRegExp.test(inputAddress.value)) {
-          addressErrorMsg.innerHTML = '';
-      } else {
-          addressErrorMsg.innerHTML = 'Veuillez renseigner ce champ.';
-      }
-  };
-
-  //validation de la ville
-  const validCity = function(inputCity) {
-      let cityErrorMsg = inputCity.nextElementSibling;
-
-      if (charRegExp.test(inputCity.value)) {
-          cityErrorMsg.innerHTML = '';
-      } else {
-          cityErrorMsg.innerHTML = 'Veuillez renseigner ce champ.';
-      }
-  };
-
-  //validation de l'email
-  const validEmail = function(inputEmail) {
-      let emailErrorMsg = inputEmail.nextElementSibling;
-
-      if (emailRegExp.test(inputEmail.value)) {
-          emailErrorMsg.innerHTML = '';
-      } else {
-          emailErrorMsg.innerHTML = 'Merci de renseigner une adresse mail valide.';
-      }
-  };
+//validation du prénom
+const validFirstName = function (inputFirstName) {
+  let firstNameErrorMsg = inputFirstName.nextElementSibling;
+  let isValid = false;
+  if (charRegExp.test(inputFirstName.value)) {
+    firstNameErrorMsg.innerHTML = '';
+    isValid = true;
+  } else {
+    firstNameErrorMsg.innerHTML = 'Veuillez renseigner ce champ.';
   }
+  return isValid;
+};
+
+//validation du nom
+const validLastName = function (inputLastName) {
+  let lastNameErrorMsg = inputLastName.nextElementSibling;
+  let isValid = false;
+  if (charRegExp.test(inputLastName.value)) {
+    lastNameErrorMsg.innerHTML = '';
+    isValid = true;
+  } else {
+    lastNameErrorMsg.innerHTML = 'Veuillez renseigner ce champ.';
+  }
+  return isValid;
+};
+
+//validation de l'adresse
+const validAddress = function (inputAddress) {
+  let addressErrorMsg = inputAddress.nextElementSibling;
+  let isValid = false;
+  if (addressRegExp.test(inputAddress.value)) {
+    addressErrorMsg.innerHTML = '';
+    isValid = true;
+  } else {
+    addressErrorMsg.innerHTML = 'Veuillez renseigner ce champ. (Exemple: "1 rue de la réussite"';
+  }
+  return isValid;
+};
+
+//validation de la ville
+const validCity = function (inputCity) {
+  let cityErrorMsg = inputCity.nextElementSibling;
+  let isValid = false;
+  if (charRegExp.test(inputCity.value)) {
+    cityErrorMsg.innerHTML = '';
+    isValid = true;
+  } else {
+    cityErrorMsg.innerHTML = 'Veuillez renseigner ce champ.';
+  }
+  return isValid;
+};
+
+//validation de l'email
+const validEmail = function (inputEmail) {
+  let emailErrorMsg = inputEmail.nextElementSibling;
+  let isValid = false;
+  if (emailRegExp.test(inputEmail.value)) {
+    emailErrorMsg.innerHTML = '';
+    isValid = true;
+  } else {
+    emailErrorMsg.innerHTML = 'Merci de renseigner une adresse mail valide.';
+  }
+  return isValid;
+};
+
+
 getForm();
 
-//Envoi des informations client au localstorage
-function postForm(){
+//Création de la fonction d'envoi du formulaire
+function postForm() {
   const btn_commander = document.getElementById("order");
 
   //Ecouter le panier
-  btn_commander.addEventListener("click", (e)=>{
-  
-      //Récupération des coordonnées du formulaire client
-      let inputName = document.getElementById('firstName');
-      let inputLastName = document.getElementById('lastName');
-      let inputAdress = document.getElementById('address');
-      let inputCity = document.getElementById('city');
-      let inputMail = document.getElementById('email');
+  btn_commander.addEventListener("click", (e) => {
 
-      //Construction d'un array depuis le LS
-      let idProducts = [];
-      for (let i = 0; i<panier.length;i++) {
-          idProducts.push(panier[i].id);
-      }
-      console.log(idProducts);
-     
-      const order = {
-          contact : {
-              firstName: inputName.value,
-              lastName: inputLastName.value,
-              address: inputAdress.value,
-              city: inputCity.value,
-              email: inputMail.value,
-          },
-          products: idProducts,
-      } 
+    e.preventDefault();
+// Récupération des articles du panier
+    panier = getCartOnLocalStorage();;
 
-      const options = {
-          method: 'POST',
-          body: JSON.stringify(order),
-          headers: {
-              'Accept': 'application/json', 
-              "Content-Type": "application/json" 
-          },
-      };
+    if (panier.length <= 0) {
+      alert("Votre panier est vide.");
+      return;
+    }
 
-      fetch("http://localhost:3000/api/products/order", options)
+    //Récupération des coordonnées du formulaire client
+    let inputFirstName = document.getElementById('firstName');
+    let inputLastName = document.getElementById('lastName');
+    let inputAdress = document.getElementById('address');
+    let inputCity = document.getElementById('city');
+    let inputMail = document.getElementById('email');
+
+    let firstNameIsvalid = validFirstName(inputFirstName);
+    let lastNameIsvalid = validFirstName(inputLastName);
+    let adressIsvalid = validAddress(inputAdress);
+    let cityIsvalid = validCity(inputCity);
+    let mailIsvalid = validEmail(inputMail);
+
+    // S'il manque une information, on informe l'utilisateur, et on met en pause l'exécution du code
+    if (!firstNameIsvalid || !lastNameIsvalid || !adressIsvalid || !cityIsvalid || !mailIsvalid) {
+      alert("Une ou plusieurs informations du formulaire de validation de commande sont inccorectes.");
+      return;
+    }
+
+    //Construction d'un array depuis le localStorage
+    let idProducts = [];
+    for (let i = 0; i < panier.length; i++) {
+      idProducts.push(panier[i].id);
+    }
+//Création des informations de la commande (infos client + produits du panier)
+    const order = {
+      contact: {
+        firstName: inputFirstName.value,
+        lastName: inputLastName.value,
+        address: inputAdress.value,
+        city: inputCity.value,
+        email: inputMail.value,
+      },
+      products: idProducts,
+    }
+
+    // On place ces informations dans un JSON
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(order),
+      headers: {
+        'Accept': 'application/json',
+        "Content-Type": "application/json"
+      },
+    };
+
+   // Préparation des infos à transmettre pour la page Confirmation
+    fetch("http://localhost:3000/api/products/order", options)
       .then((response) => response.json())
       .then((data) => {
-          console.log(data);
-          localStorage.clear();
-          localStorage.setItem("orderId", data.orderId);
-
-          document.location.href = "confirmation.html";
+        localStorage.clear();
+        document.location.href = `confirmation.html?orderId=${data.orderId}`;
       })
       .catch((err) => {
-          alert ("Problème avec fetch : " + err.message);
+        alert("Problème avec fetch : " + err.message);
       });
-      })
+  });
+
 }
+// Appel de la fonction et envoi du formaulaire
 postForm();
+
+// Récupération des informations du localStorage pour mettre sous forme de tableau pour afficher quelque chose même si le panier est vide
+function getCartOnLocalStorage() {
+  let cart = JSON.parse(localStorage.getItem("cart"));
+  if (!cart) {
+    cart = [];
+  }
+  return cart;
+}
+
 
