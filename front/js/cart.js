@@ -98,6 +98,10 @@ function modifQuantité(products) {
       e.preventDefault();
       let panier = getCartOnLocalStorage();;
       for (let product of panier) {
+        if (itemQuantitySelector.value <= 0 && itemQuantitySelector.value < 100) {
+          alert("Veuillez choisir une quantité comprise entre 1 et 100.");
+          return;
+        }
         if (product.id == productId && product.color == productColor) {
           product.quantity = parseInt(itemQuantitySelector.value);
           localStorage.setItem("cart", JSON.stringify(panier));
